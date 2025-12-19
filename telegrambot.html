@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌀 Квантовая Лаборатория Mini App</title>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: var(--tg-theme-bg-color, #0a0a1a);
+            --tg-theme-text-color: var(--tg-theme-text-color, #00f3ff);
+            --tg-theme-hint-color: var(--tg-theme-hint-color, #b967ff);
+            --tg-theme-link-color: var(--tg-theme-link-color, #00ff88);
+            --tg-theme-button-color: var(--tg-theme-button-color, #00f3ff);
+            --tg-theme-button-text-color: var(--tg-theme-button-text-color, #0a0a1a);
+            --tg-theme-secondary-bg-color: var(--tg-theme-secondary-bg-color, rgba(10, 10, 26, 0.8);
+            --quantum-blue: #00f3ff;
+            --neon-purple: #b967ff;
+            --matrix-green: #00ff88;
+            --cyber-orange: #ff6b35;
+            --dark-matter: #0a0a1a;
+            --warning-red: #ff416c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--tg-theme-bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            color: var(--tg-theme-text-color);
+            position: relative;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Main Container */
+        .tg-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Header */
+        .tg-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--tg-theme-secondary-bg-color);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tg-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--quantum-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tg-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Game Cards Grid */
+        .tg-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .tg-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+            }
+        }
+
+        /* Game Card */
+        .tg-card {
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .tg-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 243, 255, 0.15);
+        }
+
+        .tg-card-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(185, 103, 255, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .tg-card-content {
+            padding: 12px;
+            flex-grow: 1;
+        }
+
+        .tg-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--tg-theme-text-color);
+        }
+
+        .tg-card-desc {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color);
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .tg-card-footer {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tg-card-points {
+            background: linear-gradient(45deg, var(--cyber-orange), #ffd700);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--dark-matter);
+        }
+
+        .tg-card-play {
+            padding: 6px 12px;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .tg-card-play:hover {
+            opacity: 0.9;
+        }
+
+        /* Game Screen */
+        .game-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--tg-theme-bg-color);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--tg-theme-secondary-bg-color);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--tg-theme-text-color);
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 12px;
+            padding: 4px;
+        }
+
+        .game-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex-grow: 1;
+        }
+
+        .game-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            overflow: auto;
+        }
+
+        .game-canvas-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            background: #000;
+            border: 2px solid var(--quantum-blue);
+        }
+
+        .game-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .tg-btn {
+            padding: 14px;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tg-btn:hover {
+            opacity: 0.9;
+        }
+
+        .tg-btn.secondary {
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .tg-btn.danger {
+            background: var(--warning-red);
+            color: white;
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--matrix-green);
+        }
+
+        /* Instructions */
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+        }
+
+        .instructions-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--quantum-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instructions-text {
+            font-size: 13px;
+            color: var(--tg-theme-hint-color);
+            line-height: 1.5;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--tg-theme-bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 243, 255, 0.1);
+            border-top-color: var(--quantum-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .tg-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            transition: transform 0.3s;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .tg-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .tg-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .game-controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tg-btn {
+                font-size: 13px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="tg-toast" id="toast"></div>
+
+    <!-- Main Menu -->
+    <div id="mainMenu">
+        <!-- Header -->
+        <div class="tg-header">
+            <div class="tg-title">🌀 Квантовая Лаборатория</div>
+            <div class="tg-user" id="userInfo">
+                <div class="tg-avatar" id="userAvatar">U</div>
+                <div id="userName">Игрок</div>
+            </div>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="tg-container">
+            <div class="tg-grid" id="gamesGrid">
+                <!-- Games will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screens -->
+    <div id="gameScreens">
+        <!-- Each game will have its own screen -->
+    </div>
+
+    <script>
+        // Telegram Web App Initialization
+        let tg = window.Telegram.WebApp;
+        
+        // Initialize Web App
+        tg.expand();
+        tg.enableClosingConfirmation();
+        tg.BackButton.hide();
+        
+        // User Info
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('userName').textContent = user.first_name || 'Игрок';
+            if (user.photo_url) {
+                document.getElementById('userAvatar').style.backgroundImage = `url(${user.photo_url})`;
+                document.getElementById('userAvatar').textContent = '';
+            } else {
+                document.getElementById('userAvatar').textContent = user.first_name ? user.first_name[0].toUpperCase() : 'U';
+            }
+        }
+        
+        // Games Data
+        const games = [
+            {
+                id: 'snake',
+                title: '🐍 Змейка',
+                description: 'Классическая змейка с квантовым стилем',
+                icon: '🐍',
+                points: 3,
+                color: '#00ff88'
+            },
+            {
+                id: 'racing',
+                title: '🏎️ Гонки',
+                description: 'Гонки по 4-м полосам с препятствиями',
+                icon: '🏎️',
+                points: 3,
+                color: '#00f3ff'
+            },
+            {
+                id: 'maze',
+                title: '🧩 Лабиринт',
+                description: 'Найди выход из квантового лабиринта',
+                icon: '🧩',
+                points: 3,
+                color: '#b967ff'
+            },
+            {
+                id: 'shooter',
+                title: '🚀 Шутер',
+                description: 'Космический шутер с медалями',
+                icon: '🚀',
+                points: 3,
+                color: '#ff6b35'
+            },
+            {
+                id: 'shapes',
+                title: '🔮 Фигуры',
+                description: 'Создание и выбор фигур',
+                icon: '🔮',
+                points: 2,
+                color: '#ffd700'
+            },
+            {
+                id: 'trail',
+                title: '⚡ След',
+                description: 'Квантовый след с анимацией',
+                icon: '⚡',
+                points: 2,
+                color: '#ff416c'
+            }
+        ];
+        
+        // Global State
+        let currentGame = null;
+        let gameInstances = {};
+        
+        // UI Functions
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = games.map(game => `
+                <div class="tg-card" data-game="${game.id}">
+                    <div class="tg-card-image" style="background: linear-gradient(135deg, ${game.color}20, ${game.color}40)">
+                        <span style="font-size: 48px;">${game.icon}</span>
+                    </div>
+                    <div class="tg-card-content">
+                        <div class="tg-card-title">${game.title}</div>
+                        <div class="tg-card-desc">${game.description}</div>
+                    </div>
+                    <div class="tg-card-footer">
+                        <div class="tg-card-points">${game.points} кванта</div>
+                        <button class="tg-card-play" data-game="${game.id}">Играть</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners
+            document.querySelectorAll('.tg-card-play').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const gameId = btn.dataset.game;
+                    startGame(gameId);
+                });
+            });
+            
+            document.querySelectorAll('.tg-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const gameId = card.dataset.game;
+                    startGame(gameId);
+                });
+            });
+        }
+        
+        function createGameScreen(game) {
+            const screen = document.createElement('div');
+            screen.className = 'game-screen';
+            screen.id = `screen-${game.id}`;
+            
+            screen.innerHTML = `
+                <div class="game-header">
+                    <button class="back-button" onclick="closeGame()">←</button>
+                    <div class="game-title">${game.title}</div>
+                </div>
+                <div class="game-container">
+                    <div class="game-canvas-container">
+                        <canvas id="canvas-${game.id}" width="400" height="400"></canvas>
+                    </div>
+                    <div class="game-stats" id="stats-${game.id}">
+                        <!-- Stats will be filled by game -->
+                    </div>
+                    <div class="game-controls">
+                        <button class="tg-btn" onclick="startGameInstance('${game.id}')">
+                            <span>▶️</span> Старт
+                        </button>
+                        <button class="tg-btn secondary" onclick="pauseGameInstance('${game.id}')">
+                            <span>⏸️</span> Пауза
+                        </button>
+                        <button class="tg-btn danger" onclick="resetGameInstance('${game.id}')">
+                            <span>🔄</span> Сброс
+                        </button>
+                    </div>
+                    <div class="instructions">
+                        <div class="instructions-title">
+                            <span>📋</span> Управление
+                        </div>
+                        <div class="instructions-text" id="instructions-${game.id}">
+                            <!-- Instructions will be filled by game -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('gameScreens').appendChild(screen);
+            return screen;
+        }
+        
+        function startGame(gameId) {
+            const game = games.find(g => g.id === gameId);
+            if (!game) return;
+            
+            currentGame = game;
+            
+            // Show game screen
+            let screen = document.getElementById(`screen-${gameId}`);
+            if (!screen) {
+                screen = createGameScreen(game);
+            }
+            
+            document.getElementById('mainMenu').style.display = 'none';
+            screen.classList.add('active');
+            
+            // Initialize game if not already
+            if (!gameInstances[gameId]) {
+                initGame(gameId);
+            }
+            
+            // Show back button in Telegram
+            tg.BackButton.show();
+            tg.BackButton.onClick(closeGame);
+            
+            // Send view event to bot
+            tg.sendData(JSON.stringify({
+                action: 'game_view',
+                game: gameId
+            }));
+        }
+        
+        function closeGame() {
+            if (currentGame) {
+                const screen = document.getElementById(`screen-${currentGame.id}`);
+                if (screen) {
+                    screen.classList.remove('active');
+                }
+                currentGame = null;
+            }
+            
+            document.getElementById('mainMenu').style.display = 'block';
+            tg.BackButton.hide();
+            tg.BackButton.offClick(closeGame);
+        }
+        
+        // Game Initialization Functions
+        function initGame(gameId) {
+            switch(gameId) {
+                case 'snake':
+                    initSnake(gameId);
+                    break;
+                case 'racing':
+                    initRacing(gameId);
+                    break;
+                case 'maze':
+                    initMaze(gameId);
+                    break;
+                case 'shooter':
+                    initShooter(gameId);
+                    break;
+                case 'shapes':
+                    initShapes(gameId);
+                    break;
+                case 'trail':
+                    initTrail(gameId);
+                    break;
+            }
+        }
+        
+        function startGameInstance(gameId) {
+            if (gameInstances[gameId]) {
+                gameInstances[gameId].start();
+            }
+        }
+        
+        function pauseGameInstance(gameId) {
+            if (gameInstances[gameId]) {
+                gameInstances[gameId].pause();
+            }
+        }
+        
+        function resetGameInstance(gameId) {
+            if (gameInstances[gameId]) {
+                gameInstances[gameId].reset();
+            }
+        }
+        
+        // ===== SNAKE GAME =====
+        function initSnake(gameId) {
+            const canvas = document.getElementById(`canvas-${gameId}`);
+            const ctx = canvas.getContext('2d');
+            const stats = document.getElementById(`stats-${gameId}`);
+            const instructions = document.getElementById(`instructions-${gameId}`);
+            
+            // Setup UI
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Очки</div>
+                    <div class="stat-value" id="snake-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Длина</div>
+                    <div class="stat-value" id="snake-length">3</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Уровень</div>
+                    <div class="stat-value" id="snake-level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Скорость</div>
+                    <div class="stat-value" id="snake-speed">5</div>
+                </div>
+            `;
+            
+            instructions.innerHTML = 'Используйте стрелки ← → ↑ ↓ для управления змейкой. Собирайте красные яблоки!';
+            
+            // Game state
+            const game = {
+                running: false,
+                paused: false,
+                score: 0,
+                length: 3,
+                level: 1,
+                speed: 5,
+                direction: 'right',
+                nextDirection: 'right',
+                snake: [],
+                food: null,
+                gridSize: 20,
+                lastRender: 0,
+                gameLoop: null
+            };
+            
+            function init() {
+                game.snake = [];
+                const startX = 5;
+                const startY = 10;
+                
+                for (let i = 0; i < game.length; i++) {
+                    game.snake.push({
+                        x: startX - i,
+                        y: startY
+                    });
+                }
+                
+                generateFood();
+                
+                // Controls
+                const handleKeyDown = (e) => {
+                    if (!game.running || game.paused) return;
+                    
+                    switch(e.key) {
+                        case 'ArrowUp':
+                            if (game.direction !== 'down') game.nextDirection = 'up';
+                            break;
+                        case 'ArrowDown':
+                            if (game.direction !== 'up') game.nextDirection = 'down';
+                            break;
+                        case 'ArrowLeft':
+                            if (game.direction !== 'right') game.nextDirection = 'left';
+                            break;
+                        case 'ArrowRight':
+                            if (game.direction !== 'left') game.nextDirection = 'right';
+                            break;
+                    }
+                };
+                
+                document.addEventListener('keydown', handleKeyDown);
+                game.keyHandler = handleKeyDown;
+            }
+            
+            function generateFood() {
+                const gridWidth = canvas.width / game.gridSize;
+                const gridHeight = canvas.height / game.gridSize;
+                
+                let foodPosition;
+                let collision;
+                
+                do {
+                    collision = false;
+                    foodPosition = {
+                        x: Math.floor(Math.random() * gridWidth),
+                        y: Math.floor(Math.random() * gridHeight)
+                    };
+                    
+                    for (let segment of game.snake) {
+                        if (segment.x === foodPosition.x && segment.y === foodPosition.y) {
+                            collision = true;
+                            break;
+                        }
+                    }
+                } while (collision);
+                
+                game.food = foodPosition;
+            }
+            
+            function draw() {
+                // Clear canvas
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw food
+                if (game.food) {
+                    ctx.fillStyle = '#ff416c';
+                    ctx.beginPath();
+                    ctx.arc(
+                        game.food.x * game.gridSize + game.gridSize / 2,
+                        game.food.y * game.gridSize + game.gridSize / 2,
+                        game.gridSize / 2 - 2,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+                
+                // Draw snake
+                game.snake.forEach((segment, index) => {
+                    ctx.fillStyle = index === 0 ? '#00ff88' : '#00f3ff';
+                    ctx.fillRect(
+                        segment.x * game.gridSize,
+                        segment.y * game.gridSize,
+                        game.gridSize - 1,
+                        game.gridSize - 1
+                    );
+                });
+            }
+            
+            function update(timestamp) {
+                if (!game.running || game.paused) return;
+                
+                const deltaTime = timestamp - game.lastRender;
+                const renderInterval = 1000 / game.speed;
+                
+                if (deltaTime < renderInterval) return;
+                game.lastRender = timestamp;
+                
+                game.direction = game.nextDirection;
+                
+                const head = {...game.snake[0]};
+                
+                switch(game.direction) {
+                    case 'up': head.y -= 1; break;
+                    case 'down': head.y += 1; break;
+                    case 'left': head.x -= 1; break;
+                    case 'right': head.x += 1; break;
+                }
+                
+                const gridWidth = canvas.width / game.gridSize;
+                const gridHeight = canvas.height / game.gridSize;
+                
+                if (head.x < 0 || head.x >= gridWidth || head.y < 0 || head.y >= gridHeight) {
+                    gameOver();
+                    return;
+                }
+                
+                for (let segment of game.snake) {
+                    if (segment.x === head.x && segment.y === head.y) {
+                        gameOver();
+                        return;
+                    }
+                }
+                
+                game.snake.unshift(head);
+                
+                if (head.x === game.food.x && head.y === game.food.y) {
+                    game.score += 10;
+                    game.length++;
+                    
+                    if (game.score >= game.level * 100) {
+                        game.level++;
+                        game.speed += 1;
+                    }
+                    
+                    generateFood();
+                    updateUI();
+                } else {
+                    game.snake.pop();
+                }
+                
+                draw();
+            }
+            
+            function gameOver() {
+                game.running = false;
+                showToast(`💀 Игра окончена! Счет: ${game.score}`);
+                
+                // Send score to bot
+                tg.sendData(JSON.stringify({
+                    action: 'game_complete',
+                    game: 'snake',
+                    score: game.score
+                }));
+            }
+            
+            function updateUI() {
+                document.getElementById('snake-score').textContent = game.score;
+                document.getElementById('snake-length').textContent = game.length;
+                document.getElementById('snake-level').textContent = game.level;
+                document.getElementById('snake-speed').textContent = game.speed;
+            }
+            
+            function gameLoop(timestamp) {
+                update(timestamp);
+                if (game.running) {
+                    game.gameLoop = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            // Public methods
+            gameInstances[gameId] = {
+                start: () => {
+                    if (!game.running) {
+                        init();
+                        game.running = true;
+                        game.paused = false;
+                        game.score = 0;
+                        game.length = 3;
+                        game.level = 1;
+                        game.speed = 5;
+                        game.direction = 'right';
+                        game.nextDirection = 'right';
+                        game.lastRender = 0;
+                        updateUI();
+                        game.gameLoop = requestAnimationFrame(gameLoop);
+                        showToast('Змейка запущена!');
+                    }
+                },
+                pause: () => {
+                    game.paused = !game.paused;
+                    showToast(game.paused ? 'Пауза' : 'Продолжение');
+                },
+                reset: () => {
+                    game.running = false;
+                    if (game.gameLoop) {
+                        cancelAnimationFrame(game.gameLoop);
+                    }
+                    if (game.keyHandler) {
+                        document.removeEventListener('keydown', game.keyHandler);
+                    }
+                    init();
+                    draw();
+                    updateUI();
+                    showToast('Игра сброшена');
+                }
+            };
+            
+            // Initial draw
+            init();
+            draw();
+            updateUI();
+        }
+        
+        // ===== RACING GAME =====
+        function initRacing(gameId) {
+            const canvas = document.getElementById(`canvas-${gameId}`);
+            const ctx = canvas.getContext('2d');
+            const stats = document.getElementById(`stats-${gameId}`);
+            const instructions = document.getElementById(`instructions-${gameId}`);
+            
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Скорость</div>
+                    <div class="stat-value" id="racing-speed">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Полоса</div>
+                    <div class="stat-value" id="racing-lane">2</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Очки</div>
+                    <div class="stat-value" id="racing-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Время</div>
+                    <div class="stat-value" id="racing-time">0</div>
+                </div>
+            `;
+            
+            instructions.innerHTML = 'Используйте ← → для выбора полосы (все 4 полосы). Избегайте красных машин!';
+            
+            const game = {
+                running: false,
+                paused: false,
+                score: 0,
+                speed: 0,
+                lane: 2,
+                time: 0,
+                gameLoop: null,
+                carWidth: 40,
+                carHeight: 80,
+                lanes: 4,
+                obstacles: [],
+                lanePositions: [70, 140, 210, 280],
+                keyHandler: null
+            };
+            
+            function init() {
+                // Clear old handler
+                if (game.keyHandler) {
+                    document.removeEventListener('keydown', game.keyHandler);
+                }
+                
+                // New handler
+                game.keyHandler = (e) => {
+                    if (!game.running || game.paused) return;
+                    
+                    if (e.key === 'ArrowLeft' && game.lane > 1) {
+                        game.lane--;
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight' && game.lane < game.lanes) {
+                        game.lane++;
+                        e.preventDefault();
+                    }
+                };
+                
+                document.addEventListener('keydown', game.keyHandler);
+            }
+            
+            function drawRoad() {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([20, 20]);
+                
+                const laneWidth = canvas.width / game.lanes;
+                for (let i = 1; i < game.lanes; i++) {
+                    for (let y = 0; y < canvas.height; y += 40) {
+                        ctx.beginPath();
+                        ctx.moveTo(laneWidth * i, y);
+                        ctx.lineTo(laneWidth * i, y + 20);
+                        ctx.stroke();
+                    }
+                }
+                ctx.setLineDash([]);
+            }
+            
+            function drawCar() {
+                const laneIndex = game.lane - 1;
+                const x = game.lanePositions[laneIndex];
+                const y = canvas.height - game.carHeight - 20;
+                
+                ctx.fillStyle = '#00f3ff';
+                ctx.fillRect(x, y, game.carWidth, game.carHeight);
+                
+                ctx.fillStyle = '#ffd700';
+                ctx.fillRect(x + 5, y + game.carHeight - 10, game.carWidth - 10, 10);
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fillRect(x + 8, y + 10, game.carWidth - 16, 20);
+            }
+            
+            function drawObstacles() {
+                game.obstacles.forEach(obstacle => {
+                    ctx.fillStyle = '#ff416c';
+                    ctx.fillRect(obstacle.x, obstacle.y, 30, 30);
+                });
+            }
+            
+            function update() {
+                if (!game.running || game.paused) return;
+                
+                game.time += 0.016;
+                game.speed = 3 + Math.floor(game.time / 10);
+                game.score = Math.floor(game.time * 10);
+                
+                if (Math.random() < 0.015) {
+                    const lane = Math.floor(Math.random() * 4) + 1;
+                    const laneIndex = lane - 1;
+                    const x = game.lanePositions[laneIndex] + game.carWidth / 2 - 15;
+                    game.obstacles.push({
+                        x: x,
+                        y: -30,
+                        lane: lane
+                    });
+                }
+                
+                game.obstacles = game.obstacles.filter(obstacle => {
+                    obstacle.y += game.speed / 1.5;
+                    
+                    if (obstacle.lane === game.lane && 
+                        obstacle.y > canvas.height - game.carHeight - 50 &&
+                        obstacle.y < canvas.height - 30) {
+                        gameOver();
+                        return false;
+                    }
+                    
+                    return obstacle.y < canvas.height;
+                });
+                
+                updateUI();
+            }
+            
+            function gameOver() {
+                game.running = false;
+                showToast(`💥 Столкновение! Счет: ${game.score}`);
+                
+                tg.sendData(JSON.stringify({
+                    action: 'game_complete',
+                    game: 'racing',
+                    score: game.score
+                }));
+            }
+            
+            function updateUI() {
+                document.getElementById('racing-speed').textContent = game.speed;
+                document.getElementById('racing-lane').textContent = game.lane;
+                document.getElementById('racing-score').textContent = game.score;
+                document.getElementById('racing-time').textContent = Math.floor(game.time);
+            }
+            
+            function draw() {
+                drawRoad();
+                drawObstacles();
+                drawCar();
+            }
+            
+            function gameLoop() {
+                update();
+                draw();
+                if (game.running) {
+                    game.gameLoop = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            gameInstances[gameId] = {
+                start: () => {
+                    if (!game.running) {
+                        init();
+                        game.running = true;
+                        game.paused = false;
+                        game.score = 0;
+                        game.speed = 0;
+                        game.lane = 2;
+                        game.time = 0;
+                        game.obstacles = [];
+                        updateUI();
+                        game.gameLoop = requestAnimationFrame(gameLoop);
+                        showToast('Гонки начались!');
+                    }
+                },
+                pause: () => {
+                    game.paused = !game.paused;
+                    showToast(game.paused ? 'Пауза' : 'Продолжение');
+                },
+                reset: () => {
+                    game.running = false;
+                    if (game.gameLoop) {
+                        cancelAnimationFrame(game.gameLoop);
+                    }
+                    if (game.keyHandler) {
+                        document.removeEventListener('keydown', game.keyHandler);
+                    }
+                    init();
+                    drawRoad();
+                    drawCar();
+                    updateUI();
+                    showToast('Гонки сброшены');
+                }
+            };
+            
+            init();
+            drawRoad();
+            drawCar();
+            updateUI();
+        }
+        
+        // ===== MAZE GAME =====
+        function initMaze(gameId) {
+            const canvas = document.getElementById(`canvas-${gameId}`);
+            const ctx = canvas.getContext('2d');
+            const stats = document.getElementById(`stats-${gameId}`);
+            const instructions = document.getElementById(`instructions-${gameId}`);
+            
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Уровень</div>
+                    <div class="stat-value" id="maze-level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Время</div>
+                    <div class="stat-value" id="maze-time">60</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Шаги</div>
+                    <div class="stat-value" id="maze-steps">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Цель</div>
+                    <div class="stat-value">🚪</div>
+                </div>
+            `;
+            
+            instructions.innerHTML = 'Используйте стрелки ↑ ↓ ← → чтобы дойти до выхода (желтая дверь)';
+            
+            const game = {
+                running: false,
+                paused: false,
+                level: 1,
+                steps: 0,
+                timeLeft: 60,
+                gameLoop: null,
+                player: { x: 20, y: 20, size: 20 },
+                exit: { x: 360, y: 360, size: 20 },
+                walls: [],
+                keys: {},
+                lastRender: 0,
+                keyHandlers: []
+            };
+            
+            function init() {
+                game.player = { x: 20, y: 20, size: 20 };
+                game.exit = { x: 360, y: 360, size: 20 };
+                game.steps = 0;
+                game.timeLeft = 60;
+                
+                // Clear old handlers
+                game.keyHandlers.forEach(handler => {
+                    document.removeEventListener('keydown', handler.down);
+                    document.removeEventListener('keyup', handler.up);
+                });
+                game.keyHandlers = [];
+                
+                // Create walls
+                game.walls = [];
+                
+                // Outer walls
+                game.walls.push({x: 0, y: 0, width: 400, height: 20});
+                game.walls.push({x: 0, y: 0, width: 20, height: 400});
+                game.walls.push({x: 380, y: 0, width: 20, height: 400});
+                game.walls.push({x: 0, y: 380, width: 400, height: 20});
+                
+                // Inner walls based on level
+                if (game.level === 1) {
+                    game.walls.push({x: 100, y: 0, width: 20, height: 200});
+                    game.walls.push({x: 200, y: 100, width: 200, height: 20});
+                    game.walls.push({x: 300, y: 200, width: 20, height: 100});
+                    game.walls.push({x: 100, y: 300, width: 200, height: 20});
+                } else if (game.level === 2) {
+                    game.walls.push({x: 100, y: 0, width: 20, height: 150});
+                    game.walls.push({x: 200, y: 50, width: 150, height: 20});
+                    game.walls.push({x: 250, y: 150, width: 20, height: 150});
+                    game.walls.push({x: 50, y: 250, width: 200, height: 20});
+                    game.walls.push({x: 150, y: 300, width: 20, height: 80});
+                } else {
+                    game.walls.push({x: 100, y: 0, width: 20, height: 100});
+                    game.walls.push({x: 200, y: 50, width: 100, height: 20});
+                    game.walls.push({x: 250, y: 150, width: 20, height: 100});
+                    game.walls.push({x: 50, y: 250, width: 150, height: 20});
+                    game.walls.push({x: 150, y: 300, width: 20, height: 50});
+                    game.walls.push({x: 300, y: 200, width: 100, height: 20});
+                }
+                
+                // Controls
+                const keydownHandler = (e) => {
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                        game.keys[e.key] = true;
+                    }
+                };
+                
+                const keyupHandler = (e) => {
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                        game.keys[e.key] = false;
+                    }
+                };
+                
+                document.addEventListener('keydown', keydownHandler);
+                document.addEventListener('keyup', keyupHandler);
+                
+                game.keyHandlers.push({ down: keydownHandler, up: keyupHandler });
+            }
+            
+            function updateControls() {
+                const speed = 3;
+                const newPlayer = {...game.player};
+                
+                if (game.keys['ArrowUp']) newPlayer.y -= speed;
+                if (game.keys['ArrowDown']) newPlayer.y += speed;
+                if (game.keys['ArrowLeft']) newPlayer.x -= speed;
+                if (game.keys['ArrowRight']) newPlayer.x += speed;
+                
+                // Wall collision
+                let collision = false;
+                for (let wall of game.walls) {
+                    if (newPlayer.x < wall.x + wall.width &&
+                        newPlayer.x + newPlayer.size > wall.x &&
+                        newPlayer.y < wall.y + wall.height &&
+                        newPlayer.y + newPlayer.size > wall.y) {
+                        collision = true;
+                        break;
+                    }
+                }
+                
+                if (!collision) {
+                    game.player = newPlayer;
+                    game.steps++;
+                }
+                
+                // Check exit
+                if (game.player.x < game.exit.x + game.exit.size &&
+                    game.player.x + game.player.size > game.exit.x &&
+                    game.player.y < game.exit.y + game.exit.size &&
+                    game.player.y + game.player.size > game.exit.y) {
+                    
+                    game.level++;
+                    game.timeLeft += 30;
+                    showToast(`🎉 Уровень ${game.level-1} пройден!`);
+                    
+                    tg.sendData(JSON.stringify({
+                        action: 'level_complete',
+                        game: 'maze',
+                        level: game.level - 1
+                    }));
+                    
+                    init();
+                    updateUI();
+                }
+            }
+            
+            function drawBackground() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            function drawWalls() {
+                game.walls.forEach(wall => {
+                    ctx.fillStyle = '#ff416c';
+                    ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+                });
+            }
+            
+            function drawPlayer() {
+                const p = game.player;
+                
+                ctx.fillStyle = '#00ff88';
+                ctx.beginPath();
+                ctx.arc(p.x + p.size/2, p.y + p.size/2, p.size/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            function drawExit() {
+                const e = game.exit;
+                
+                ctx.fillStyle = '#ffd700';
+                ctx.fillRect(e.x, e.y, e.size, e.size);
+                
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(e.x + 5, e.y + 5, e.size - 10, e.size - 10);
+            }
+            
+            function update(timestamp) {
+                if (!game.running || game.paused) return;
+                
+                const deltaTime = timestamp - game.lastRender;
+                if (deltaTime < 16) return;
+                game.lastRender = timestamp;
+                
+                updateControls();
+                
+                game.timeLeft -= deltaTime / 1000;
+                if (game.timeLeft <= 0) {
+                    game.running = false;
+                    showToast(`⏰ Время вышло! Уровень: ${game.level}`);
+                    
+                    tg.sendData(JSON.stringify({
+                        action: 'game_complete',
+                        game: 'maze',
+                        level: game.level
+                    }));
+                }
+                
+                updateUI();
+            }
+            
+            function updateUI() {
+                document.getElementById('maze-level').textContent = game.level;
+                document.getElementById('maze-time').textContent = Math.max(0, Math.floor(game.timeLeft));
+                document.getElementById('maze-steps').textContent = game.steps;
+            }
+            
+            function draw() {
+                drawBackground();
+                drawWalls();
+                drawExit();
+                drawPlayer();
+            }
+            
+            function gameLoop(timestamp) {
+                update(timestamp);
+                draw();
+                if (game.running) {
+                    game.gameLoop = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            gameInstances[gameId] = {
+                start: () => {
+                    if (!game.running) {
+                        init();
+                        game.running = true;
+                        game.paused = false;
+                        game.lastRender = 0;
+                        updateUI();
+                        game.gameLoop = requestAnimationFrame(gameLoop);
+                        showToast('Лабиринт начался!');
+                    }
+                },
+                pause: () => {
+                    game.paused = !game.paused;
+                    showToast(game.paused ? 'Пауза' : 'Продолжение');
+                },
+                reset: () => {
+                    game.running = false;
+                    if (game.gameLoop) {
+                        cancelAnimationFrame(game.gameLoop);
+                    }
+                    game.keyHandlers.forEach(handler => {
+                        document.removeEventListener('keydown', handler.down);
+                        document.removeEventListener('keyup', handler.up);
+                    });
+                    game.keyHandlers = [];
+                    game.level = 1;
+                    game.steps = 0;
+                    game.timeLeft = 60;
+                    init();
+                    draw();
+                    updateUI();
+                    showToast('Лабиринт сброшен');
+                }
+            };
+            
+            init();
+            draw();
+            updateUI();
+        }
+        
+        // ===== SHOOTER GAME =====
+        function initShooter(gameId) {
+            const canvas = document.getElementById(`canvas-${gameId}`);
+            const ctx = canvas.getContext('2d');
+            const stats = document.getElementById(`stats-${gameId}`);
+            const instructions = document.getElementById(`instructions-${gameId}`);
+            
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Уровень</div>
+                    <div class="stat-value" id="shooter-level">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Медали</div>
+                    <div class="stat-value" id="shooter-medals">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Счет</div>
+                    <div class="stat-value" id="shooter-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Враги</div>
+                    <div class="stat-value" id="shooter-enemies">0</div>
+                </div>
+            `;
+            
+            instructions.innerHTML = 'Используйте ← → или двигайте мышью. Клавиша SPACE или клик для стрельбы';
+            
+            const game = {
+                running: false,
+                paused: false,
+                level: 1,
+                medals: 0,
+                score: 0,
+                enemies: 0,
+                gameLoop: null,
+                player: { x: 200, y: 350, width: 40, height: 40, speed: 5 },
+                enemiesList: [],
+                medalsList: [],
+                bullets: [],
+                enemySpawnRate: 100,
+                medalSpawnRate: 150,
+                frameCount: 0,
+                lastRender: 0,
+                keyHandlers: [],
+                mouseHandlers: []
+            };
+            
+            function init() {
+                game.player = { x: 200, y: 350, width: 40, height: 40, speed: 5 };
+                game.enemiesList = [];
+                game.medalsList = [];
+                game.bullets = [];
+                game.frameCount = 0;
+                
+                // Clear old handlers
+                game.keyHandlers.forEach(handler => {
+                    document.removeEventListener('keydown', handler);
+                });
+                game.mouseHandlers.forEach(handler => {
+                    canvas.removeEventListener('mousemove', handler.move);
+                    canvas.removeEventListener('click', handler.click);
+                });
+                
+                // Keyboard controls
+                const keys = {};
+                const keydownHandler = (e) => {
+                    if (['ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                        keys[e.key] = true;
+                    }
+                };
+                
+                const keyupHandler = (e) => {
+                    if (['ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                        keys[e.key] = false;
+                    }
+                };
+                
+                document.addEventListener('keydown', keydownHandler);
+                document.addEventListener('keyup', keyupHandler);
+                game.keyHandlers = [keydownHandler, keyupHandler];
+                
+                // Mouse controls
+                const mouseMoveHandler = (e) => {
+                    if (!game.running || game.paused) return;
+                    const rect = canvas.getBoundingClientRect();
+                    game.player.x = e.clientX - rect.left - game.player.width / 2;
+                };
+                
+                const clickHandler = (e) => {
+                    if (!game.running || game.paused) return;
+                    shootBullet();
+                };
+                
+                canvas.addEventListener('mousemove', mouseMoveHandler);
+                canvas.addEventListener('click', clickHandler);
+                game.mouseHandlers = [{ move: mouseMoveHandler, click: clickHandler }];
+                
+                function updateControls() {
+                    if (keys['ArrowLeft']) game.player.x -= game.player.speed;
+                    if (keys['ArrowRight']) game.player.x += game.player.speed;
+                    if (keys[' ']) {
+                        shootBullet();
+                        keys[' '] = false;
+                    }
+                    
+                    game.player.x = Math.max(0, Math.min(game.player.x, canvas.width - game.player.width));
+                }
+                
+                function shootBullet() {
+                    game.bullets.push({
+                        x: game.player.x + game.player.width / 2 - 3,
+                        y: game.player.y,
+                        width: 6,
+                        height: 15,
+                        speed: 10
+                    });
+                }
+                
+                game.updateControls = updateControls;
+                game.shootBullet = shootBullet;
+            }
+            
+            function drawBackground() {
+                ctx.fillStyle = '#000011';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                for (let i = 0; i < 50; i++) {
+                    const x = (i * 8) % canvas.width;
+                    const y = (i * 13) % canvas.height;
+                    ctx.fillStyle = i % 3 === 0 ? '#fff' : '#00f3ff';
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+            
+            function drawPlayer() {
+                const p = game.player;
+                
+                ctx.fillStyle = '#00ff88';
+                ctx.beginPath();
+                ctx.moveTo(p.x + p.width / 2, p.y);
+                ctx.lineTo(p.x, p.y + p.height);
+                ctx.lineTo(p.x + p.width, p.y + p.height);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            function drawEnemies() {
+                game.enemiesList.forEach(enemy => {
+                    ctx.fillStyle = '#ff416c';
+                    ctx.beginPath();
+                    ctx.moveTo(enemy.x + enemy.width / 2, enemy.y + enemy.height);
+                    ctx.lineTo(enemy.x, enemy.y);
+                    ctx.lineTo(enemy.x + enemy.width, enemy.y);
+                    ctx.closePath();
+                    ctx.fill();
+                });
+            }
+            
+            function drawMedals() {
+                game.medalsList.forEach(medal => {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.arc(medal.x + medal.size / 2, medal.y + medal.size / 2, medal.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            
+            function drawBullets() {
+                game.bullets.forEach(bullet => {
+                    ctx.fillStyle = '#00f3ff';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                });
+            }
+            
+            function update(timestamp) {
+                if (!game.running || game.paused) return;
+                
+                const deltaTime = timestamp - game.lastRender;
+                if (deltaTime < 16) return;
+                game.lastRender = timestamp;
+                
+                game.frameCount++;
+                
+                game.updateControls();
+                
+                if (game.frameCount % game.enemySpawnRate === 0) {
+                    const size = 20 + Math.random() * 20;
+                    game.enemiesList.push({
+                        x: Math.random() * (canvas.width - size),
+                        y: -size,
+                        width: size,
+                        height: size,
+                        speed: 1 + Math.random() * 2
+                    });
+                    game.enemies = game.enemiesList.length;
+                }
+                
+                if (game.frameCount % game.medalSpawnRate === 0) {
+                    const size = 15;
+                    game.medalsList.push({
+                        x: Math.random() * (canvas.width - size),
+                        y: -size,
+                        size: size,
+                        speed: 1 + Math.random() * 1.5
+                    });
+                }
+                
+                game.enemiesList = game.enemiesList.filter(enemy => {
+                    enemy.y += enemy.speed;
+                    
+                    if (enemy.x < game.player.x + game.player.width &&
+                        enemy.x + enemy.width > game.player.x &&
+                        enemy.y < game.player.y + game.player.height &&
+                        enemy.y + enemy.height > game.player.y) {
+                        
+                        gameOver();
+                        return false;
+                    }
+                    
+                    let hit = false;
+                    game.bullets = game.bullets.filter(bullet => {
+                        if (bullet.x < enemy.x + enemy.width &&
+                            bullet.x + bullet.width > enemy.x &&
+                            bullet.y < enemy.y + enemy.height &&
+                            bullet.y + bullet.height > enemy.y) {
+                            
+                            game.score += 50;
+                            hit = true;
+                            return false;
+                        }
+                        return true;
+                    });
+                    
+                    if (hit) return false;
+                    
+                    return enemy.y < canvas.height;
+                });
+                
+                game.medalsList = game.medalsList.filter(medal => {
+                    medal.y += medal.speed;
+                    
+                    const medalCenterX = medal.x + medal.size / 2;
+                    const medalCenterY = medal.y + medal.size / 2;
+                    const playerCenterX = game.player.x + game.player.width / 2;
+                    const playerCenterY = game.player.y + game.player.height / 2;
+                    
+                    const distance = Math.sqrt(
+                        Math.pow(medalCenterX - playerCenterX, 2) +
+                        Math.pow(medalCenterY - playerCenterY, 2)
+                    );
+                    
+                    if (distance < (game.player.width / 2 + medal.size / 2)) {
+                        game.medals++;
+                        game.score += 100;
+                        
+                        if (game.medals >= game.level * 3) {
+                            game.level++;
+                            game.enemySpawnRate = Math.max(30, game.enemySpawnRate - 10);
+                            game.medalSpawnRate = Math.max(60, game.medalSpawnRate - 15);
+                        }
+                        
+                        return false;
+                    }
+                    
+                    return medal.y < canvas.height;
+                });
+                
+                game.bullets = game.bullets.filter(bullet => {
+                    bullet.y -= bullet.speed;
+                    return bullet.y > 0;
+                });
+                
+                game.enemies = game.enemiesList.length;
+                
+                updateUI();
+            }
+            
+            function gameOver() {
+                game.running = false;
+                showToast(`💥 Корабль уничтожен! Счет: ${game.score}`);
+                
+                tg.sendData(JSON.stringify({
+                    action: 'game_complete',
+                    game: 'shooter',
+                    score: game.score,
+                    level: game.level
+                }));
+            }
+            
+            function updateUI() {
+                document.getElementById('shooter-level').textContent = game.level;
+                document.getElementById('shooter-medals').textContent = game.medals;
+                document.getElementById('shooter-score').textContent = game.score;
+                document.getElementById('shooter-enemies').textContent = game.enemies;
+            }
+            
+            function draw() {
+                drawBackground();
+                drawMedals();
+                drawEnemies();
+                drawBullets();
+                drawPlayer();
+            }
+            
+            function gameLoop(timestamp) {
+                update(timestamp);
+                draw();
+                if (game.running) {
+                    game.gameLoop = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            gameInstances[gameId] = {
+                start: () => {
+                    if (!game.running) {
+                        init();
+                        game.running = true;
+                        game.paused = false;
+                        game.level = 1;
+                        game.medals = 0;
+                        game.score = 0;
+                        game.enemies = 0;
+                        game.enemySpawnRate = 100;
+                        game.medalSpawnRate = 150;
+                        game.frameCount = 0;
+                        game.lastRender = 0;
+                        updateUI();
+                        game.gameLoop = requestAnimationFrame(gameLoop);
+                        showToast('Шутер запущен!');
+                    }
+                },
+                pause: () => {
+                    game.paused = !game.paused;
+                    showToast(game.paused ? 'Пауза' : 'Продолжение');
+                },
+                reset: () => {
+                    game.running = false;
+                    if (game.gameLoop) {
+                        cancelAnimationFrame(game.gameLoop);
+                    }
+                    game.keyHandlers.forEach(handler => {
+                        document.removeEventListener('keydown', handler);
+                    });
+                    game.mouseHandlers.forEach(handler => {
+                        canvas.removeEventListener('mousemove', handler.move);
+                        canvas.removeEventListener('click', handler.click);
+                    });
+                    init();
+                    drawBackground();
+                    drawPlayer();
+                    updateUI();
+                    showToast('Шутер сброшен');
+                }
+            };
+            
+            init();
+            drawBackground();
+            drawPlayer();
+            updateUI();
+        }
+        
+        // ===== SHAPES GAME (Simple) =====
+        function initShapes(gameId) {
+            const canvas = document.getElementById(`canvas-${gameId}`);
+            const ctx = canvas.getContext('2d');
+            const stats = document.getElementById(`stats-${gameId}`);
+            const instructions = document.getElementById(`instructions-${gameId}`);
+            
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Фигур</div>
+                    <div class="stat-value" id="shapes-count">5</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Выбрано</div>
+                    <div class="stat-value" id="shapes-selected">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Цвет</div>
+                    <div class="stat-value">🌈</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Форма</div>
+                    <div class="stat-value">🔺🔵</div>
+                </div>
+            `;
+            
+            instructions.innerHTML = 'Кликайте на фигуры для выбора. Используйте + и - для изменения количества.';
+            
+            const game = {
+                shapes: [],
+                selected: null,
+                count: 5
+            };
+            
+            function createShapes() {
+                game.shapes = [];
+                const colors = ['#00f3ff', '#b967ff', '#00ff88', '#ff6b35', '#ffd700'];
+                
+                for (let i = 0; i < game.count; i++) {
+                    const size = 40 + Math.random() * 20;
+                    const x = 50 + (i * 70) % 350;
+                    const y = 50 + Math.floor((i * 70) / 350) * 100;
+                    const isCircle = Math.random() > 0.5;
+                    
+                    game.shapes.push({
+                        x, y, size,
+                        color: colors[i % colors.length],
+                        isCircle,
+                        id: i
+                    });
+                }
+            }
+            
+            function draw() {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                game.shapes.forEach(shape => {
+                    ctx.fillStyle = shape.color;
+                    if (shape.isCircle) {
+                        ctx.beginPath();
+                        ctx.arc(shape.x, shape.y, shape.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(shape.x - shape.size/2, shape.y - shape.size/2, shape.size, shape.size);
+                    }
+                    
+                    // Highlight selected
+                    if (game.selected === shape.id) {
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 3;
+                        if (shape.isCircle) {
+                            ctx.beginPath();
+                            ctx.arc(shape.x, shape.y, shape.size / 2 + 2, 0, Math.PI * 2);
+                            ctx.stroke();
+                        } else {
+                            ctx.strokeRect(shape.x - shape.size/2 - 2, shape.y - shape.size/2 - 2, shape.size + 4, shape.size + 4);
+                        }
+                    }
+                });
+            }
+            
+            function handleClick(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                for (let i = game.shapes.length - 1; i >= 0; i--) {
+                    const shape = game.shapes[i];
+                    const distance = Math.sqrt(Math.pow(x - shape.x, 2) + Math.pow(y - shape.y, 2));
+                    
+                    if (distance < shape.size / 2) {
+                        game.selected = game.selected === shape.id ? null : shape.id;
+                        updateUI();
+                        draw();
+                        break;
+                    }
+                }
+            }
+            
+            function updateUI() {
+                document.getElementById('shapes-count').textContent = game.count;
+                document.getElementById('shapes-selected').textContent = game.selected !== null ? '1' : '0';
+            }
+            
+            gameInstances[gameId] = {
+                start: () => {
+                    createShapes();
+                    draw();
+                    updateUI();
+                    
+                    canvas.addEventListener('click', handleClick);
+                    game.clickHandler = handleClick;
+                    
+                    showToast('Фигуры созданы!');
+                },
+                pause: () => {
+                    showToast('Эта игра не поддерживает паузу');
+                },
+                reset: () => {
+                    if (game.clickHandler) {
+                        canvas.removeEventListener('click', game.clickHandler);
+                    }
+                    game.count = 5;
+                    game.selected = null;
+                    createShapes();
+                    draw();
+                    updateUI();
+                    showToast('Фигуры сброшены');
+                }
+            };
+            
+            // Add control buttons
+            const controls = document.querySelector(`#screen-${gameId} .game-controls`);
+            controls.innerHTML = `
+                <button class="tg-btn" onclick="gameInstances['${gameId}'].addShape()">
+                    <span>➕</span> Добавить
+                </button>
+                <button class="tg-btn secondary" onclick="gameInstances['${gameId}'].removeShape()">
+                    <span>➖</span> Убрать
+                </button>
+                <button class="tg-btn danger" onclick="gameInstances['${gameId}'].reset()">
+                    <span>🔄</span> Сброс
+                </button>
+            `;
+            
+            // Add methods to game instance
+            gameInstances[gameId].addShape = () => {
+                game.count = Math.min(10, game.count + 1);
+                createShapes();
+                draw();
+                updateUI();
+            };
+            
+            gameInstances[gameId].removeShape = () => {
+                game.count = Math.max(1, game.count - 1);
+                createShapes();
+                draw();
+                updateUI();
+            };
+            
+            // Initial setup
+            gameInstances[gameId].start();
+        }
+        
+        // ===== TRAIL GAME =====
+        function initTrail(gameId) {
+            const canvas = document.getElementById(`canvas-${gameId}`);
+            const ctx = canvas.getContext('2d');
+            const stats = document.getElementById(`stats-${gameId}`);
+            const instructions = document.getElementById(`instructions-${gameId}`);
+            
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Скорость</div>
+                    <div class="stat-value" id="trail-speed">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Частицы</div>
+                    <div class="stat-value" id="trail-particles">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Цвет</div>
+                    <div class="stat-value">🌈</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Эффект</div>
+                    <div class="stat-value">✨</div>
+                </div>
+            `;
+            
+            instructions.innerHTML = 'Двигайте мышью по экрану чтобы создать квантовый след. Нажмите для смены цвета.';
+            
+            const game = {
+                running: false,
+                particles: [],
+                colors: ['#00f3ff', '#b967ff', '#00ff88', '#ff6b35'],
+                currentColor: 0,
+                lastMouse: { x: 0, y: 0 },
+                speed: 0,
+                gameLoop: null,
+                mouseHandlers: []
+            };
+            
+            function createParticle(x, y) {
+                return {
+                    x, y,
+                    size: Math.random() * 4 + 2,
+                    color: game.colors[game.currentColor],
+                    life: 1.0,
+                    speedX: Math.random() * 4 - 2,
+                    speedY: Math.random() * 4 - 2
+                };
+            }
+            
+            function draw() {
+                // Clear with fade effect
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                game.particles.forEach((particle, index) => {
+                    particle.life -= 0.01;
+                    
+                    if (particle.life <= 0) {
+                        game.particles.splice(index, 1);
+                        return;
+                    }
+                    
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+                    
+                    ctx.globalAlpha = particle.life;
+                    ctx.fillStyle = particle.color;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                ctx.globalAlpha = 1.0;
+            }
+            
+            function handleMouseMove(e) {
+                if (!game.running) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Create multiple particles
+                for (let i = 0; i < 3; i++) {
+                    game.particles.push(createParticle(
+                        x + Math.random() * 10 - 5,
+                        y + Math.random() * 10 - 5
+                    ));
+                }
+                
+                // Calculate speed
+                const dx = x - game.lastMouse.x;
+                const dy = y - game.lastMouse.y;
+                game.speed = Math.sqrt(dx * dx + dy * dy);
+                game.lastMouse = { x, y };
+                
+                updateUI();
+            }
+            
+            function handleClick() {
+                game.currentColor = (game.currentColor + 1) % game.colors.length;
+                showToast(`Цвет изменен: ${game.colors[game.currentColor]}`);
+            }
+            
+            function updateUI() {
+                document.getElementById('trail-speed').textContent = Math.round(game.speed);
+                document.getElementById('trail-particles').textContent = game.particles.length;
+            }
+            
+            function gameLoop() {
+                draw();
+                if (game.running) {
+                    game.gameLoop = requestAnimationFrame(gameLoop);
+                }
+            }
+            
+            gameInstances[gameId] = {
+                start: () => {
+                    if (!game.running) {
+                        game.running = true;
+                        
+                        const mouseMoveHandler = (e) => handleMouseMove(e);
+                        const clickHandler = () => handleClick();
+                        
+                        canvas.addEventListener('mousemove', mouseMoveHandler);
+                        canvas.addEventListener('click', clickHandler);
+                        
+                        game.mouseHandlers = [
+                            { type: 'mousemove', handler: mouseMoveHandler },
+                            { type: 'click', handler: clickHandler }
+                        ];
+                        
+                        game.gameLoop = requestAnimationFrame(gameLoop);
+                        showToast('Квантовый след активирован!');
+                    }
+                },
+                pause: () => {
+                    game.running = !game.running;
+                    if (game.running) {
+                        game.gameLoop = requestAnimationFrame(gameLoop);
+                    }
+                    showToast(game.running ? 'Продолжение' : 'Пауза');
+                },
+                reset: () => {
+                    game.running = false;
+                    if (game.gameLoop) {
+                        cancelAnimationFrame(game.gameLoop);
+                    }
+                    
+                    game.mouseHandlers.forEach(h => {
+                        canvas.removeEventListener(h.type, h.handler);
+                    });
+                    game.mouseHandlers = [];
+                    
+                    game.particles = [];
+                    game.speed = 0;
+                    
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    updateUI();
+                    showToast('След очищен');
+                }
+            };
+            
+            // Initial setup
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            updateUI();
+        }
+        
+        // Initialize the app
+        function initApp() {
+            hideLoading();
+            renderGames();
+            
+            // Send ready event to bot
+            tg.sendData(JSON.stringify({
+                action: 'app_ready',
+                version: '1.0.0'
+            }));
+            
+            showToast('🌀 Квантовая Лаборатория загружена!');
+        }
+        
+        // Start the app
+        setTimeout(initApp, 1000);
+        
+        // Handle theme changes
+        tg.onEvent('themeChanged', () => {
+            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0a1a');
+            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#00f3ff');
+            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#b967ff');
+            document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#00ff88');
+            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#00f3ff');
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#0a0a1a');
+        });
+        
+        // Handle viewport changes
+        tg.onEvent('viewportChanged', () => {
+            tg.expand();
+        });
+    </script>
+</body>
+</html>
